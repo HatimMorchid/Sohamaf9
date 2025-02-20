@@ -624,43 +624,51 @@ body.dark-mode p {
         }
     </script>
 	<script>
-	document.addEventListener("DOMContentLoaded", function() {
-  const apiUrl = "https://script.google.com/macros/s/AKfycbzClIMn3EPwDzZu-sllHkkPlcE6zbkth2gnFMGEg-d6gz-v1SQrzL7YjeJXQD0ASUE/exec"; // Replace this with your Apps Script URL
-  
-  fetch(apiUrl)
-    .then(response => response.json())
-    .then(data => {
-      let productsContainer = document.querySelector('.packs');
-      
-      // Clear existing products
-      productsContainer.innerHTML = '';
-      
-      data.forEach(product => {
-        let productElement = document.createElement('div');
-        productElement.classList.add('pack');
-        
-        productElement.innerHTML = `
-          <div class="image-container">
-            <img src="img/Pack1.jpg" alt="Pack Image"> <!-- You can modify the image path dynamically if necessary -->
-          </div>
-          <h3>${product.name}</h3>
-          <p>${product.description}</p>
-          <div class="price">
-            <span class="regular-price">${product.price} MAD</span>
-            <span class="promo-price">${product.price * 0.8} MAD</span> <!-- Example of a promo price -->
-          </div>
-          <a href="#" class="green-btn">
-            <img src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg" alt="WhatsApp Logo" class="whatsapp-icon">
-            Commander Maintenant
-          </a>
-        `;
-        
-        productsContainer.appendChild(productElement);
-      });
-    })
-    .catch(error => console.error('Error fetching data:', error));
-});
+  document.addEventListener("DOMContentLoaded", function() {
+    const sheetId = '1gdPK2U8ULsRZjwly4svWSyjNtX8Lt01FwbhfFgY7pPs';  // Replace this with your Google Sheet ID
+    const apiKey = 'AKfycbzClIMn3EPwDzZu-sllHkkPlcE6zbkth2gnFMGEg-d6gz-v1SQrzL7YjeJXQD0ASUE';  // Replace this with your API Key
+    const sheetUrl = `https://cors-anywhere.herokuapp.com/https://sheets.googleapis.com/v4/spreadsheets/${sheetId}/values/SOHAMAF?key=${apiKey}`;  // Corrected URL for your sheet
 
-	</script>
+    fetch(sheetUrl)
+      .then(response => response.json())
+      .then(data => {
+        let productsContainer = document.querySelector('.packs');
+        
+        // Clear existing products
+        productsContainer.innerHTML = '';
+        
+        // Loop through the rows (starting from index 1 to skip the header row)
+        for (let i = 1; i < data.values.length; i++) {
+          let product = data.values[i];
+          
+          // Create product element
+          let productElement = document.createElement('div');
+          productElement.classList.add('pack');
+          
+          // Inject the product data dynamically
+          productElement.innerHTML = `
+            <div class="image-container">
+              <img src="${product[3]}" alt="Pack Image"> <!-- Assuming the image URL is in column 4 -->
+            </div>
+            <h3>${product[0]}</h3> <!-- Product name from column 1 -->
+            <p>${product[1]}</p> <!-- Description from column 2 -->
+            <div class="price">
+              <span class="regular-price">${product[4]} MAD</span> <!-- Regular price from column 5 -->
+              <span class="promo-price">${product[5]} MAD</span> <!-- Promo price from column 6 -->
+            </div>
+            <a href="#" class="green-btn">
+              <img src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg" alt="WhatsApp Logo" class="whatsapp-icon">
+              Commander Maintenant
+            </a>
+          `;
+          
+          // Append product element to the container
+          productsContainer.appendChild(productElement);
+        }
+      })
+      .catch(error => console.error('Error fetching data:', error));
+  });
+</script>
+
 </body>
 </html>
